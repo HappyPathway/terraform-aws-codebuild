@@ -1,70 +1,27 @@
-name: Terraform Release
-
+name: Terraform CI/CD
 on:
   push:
     branches:
       - main
-
 jobs:
-  validate:
+  terraform-ci-cd:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.5.0"
-
-      - name: Terraform Init
-        run: terraform init
-      
-      - name: Terraform Format Check
-        run: terraform fmt -check
-        
-      - name: Terraform Validate
-        run: terraform validate
-
-  release:
-    needs: validate
-    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          
-      - name: Bump Version and Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Install semantic-release and plugins
-          npm install -g semantic-release @semantic-release/git @semantic-release/github
-          
-          # Generate a new release
-          semantic-release
 
-      - name: Push New Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Ensure the new tag is pushed back to the repository
-          git push --follow-tags origin main
-
-  docs:
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Render terraform docs
-        uses: terraform-docs/gh-actions@v1.0.0
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          working-dir: .
-          output-file: README.md
-          output-method: inject
-          git-push: true
+          terraform_version: "1.10.5"  # Specify your desired version
+
+      - name: Run Terraform Module Release Action
+        uses: HappyPathway/terraform-module-release@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: '.'
