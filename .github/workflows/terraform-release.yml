@@ -38,12 +38,22 @@ jobs:
         with:
           node-version: '18'
           
-      - name: Release
+      - name: Bump Version and Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Install semantic-release and plugins
           npm install -g semantic-release @semantic-release/git @semantic-release/github
+          
+          # Generate a new release
           semantic-release
+
+      - name: Push New Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Ensure the new tag is pushed back to the repository
+          git push --follow-tags origin main
 
   docs:
     needs: release
