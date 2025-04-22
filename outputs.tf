@@ -26,6 +26,6 @@ output "badge_url" {
 
 output "service_role" {
   description = "The ARN of the IAM service role applied to this project"
-  value       = aws_iam_role.terraform_codebuild_role.arn
+  value       = { for k, v in aws_codebuild_project.terraform_codebuild_project : k => v.service_role }
 }
 
