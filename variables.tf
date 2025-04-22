@@ -90,6 +90,11 @@ variable "kms_key_arn" {
   type        = string
 }
 
+variable "source_location" {
+  description = "Location of the source code, required when build_project_source is S3 or GITHUB"
+  type        = string
+  default     = null
+}
 
 variable "environment_variables" {
   type = list(object({
@@ -139,7 +144,6 @@ variable "docker_build" {
   type    = bool
   default = false
 }
-
 
 variable "required_packages" {
   type = list(object({

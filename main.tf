@@ -121,6 +121,8 @@ resource "aws_codebuild_project" "terraform_codebuild_project" {
   }
   source {
     type = var.build_project_source
+    # Add location unless source type is CODEPIPELINE
+    location = var.build_project_source != "CODEPIPELINE" ? lookup(each.value.build_project_source, "location", var.source_location) : null
     # 
     # The test phase requires a state backend whereas the build phase does not.
     # that's the whole reason for this code here.
